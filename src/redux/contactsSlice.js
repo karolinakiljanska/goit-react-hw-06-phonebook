@@ -2,37 +2,43 @@ import { createSlice } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
-const initPhoneBook = [
-  { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-  { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-  { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-  { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-];
-const contactsSlice = createSlice({
-  name: 'contacts',
-  initialState: { items: initPhoneBook, filter: '' },
-  reducers: {
-    addNewContact: (state, action) => {
-      state.items.push(action.payload);
-    },
+const contactkInitialState = {
+  items: [
+    { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+    { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+    { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+    { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+  ],
+};
 
-    deleteContact: (state, action) => {
-      state.items = state.items.filter(({ id }) => id !== action.payload);
+const contactSlice = createSlice({
+  name: 'contacts',
+  initialState: contactkInitialState,
+  reducers: {
+    addNewContact(state, action) {
+      state.items.unshift(action.payload);
+    },
+    deleteContact(state, action) {
+      state.items = state.items.filter(
+        contact => contact.id !== action.payload
+      );
     },
   },
 });
+
 const persistConfig = {
-  key: 'contacts',
+  key: 'root',
   storage,
-  whitelist: ['items'],
+  blacklist: ['filter'],
 };
 
-export const persistedContactsReducer = persistReducer(
+export const persistedContactReducer = persistReducer(
   persistConfig,
-  contactsSlice.reducer
+  contactSlice.reducer
 );
 
-export const { addNewContact, filteredContacts, deleteContact } =
-  contactsSlice.actions;
+export const { addNewContact, deleteContact } = contactSlice.actions;
 
 export const getContactsItems = state => state.contacts.items;
+
+export const contactsReducer = contactSlice.reducer;
